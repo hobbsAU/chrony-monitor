@@ -6,11 +6,17 @@
 
 # Gotify server URL + API token
 # REPLACE with your own server address and token
+# Leave empty to disable Gotify notifications
 GOTIFY_URL="https://your-gotify-server.com/message?token=YOUR_TOKEN"
+
+# Discord webhook URL
+# REPLACE with your Discord webhook URL
+# Leave empty to disable Discord notifications
+DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/WEBHOOK_ID/WEBHOOK_TOKEN"
 
 # Name of the GPS/NMEA source as it appears in 'chronyc sources'
 # Change this if your source has a different name than "NMEA"
-GPS_NAME="NMEA"
+GPS_NAME="PPS"  # Example: "PPS", "NMEA", or whatever your GPS source is called in chronyc
 
 # Location of the temporary status file
 # Usually, you don't need to change this
@@ -62,25 +68,49 @@ fi
 
 
 ######################################
-# SEND GOTIFY NOTIFICATIONS
+# SEND NOTIFICATIONS
 ######################################
 
 # Only send a notification if the status has changed
 if [[ "$CURRENT_STATUS" != "$PREV_STATUS" ]]; then
     if [[ "$CURRENT_STATUS" == "FAIL" ]]; then
         # FAIL message
+        TITLE="GPS issue detected"
         MSG="🔴 GPS/NMEA is either not primary or has lost signal (reach=0) on SERVER-NAME!"
-        curl -s -X POST "$GOTIFY_URL" \
-             -F "title=GPS issue detected" \
-             -F "message=$MSG" \
-             -F "priority=10" >/dev/null
+        
+        # Send to Gotify if URL is configured
+        if [[ -n "$GOTIFY_URL" ]]; then
+            curl -s -X POST "$GOTIFY_URL" \
+                 -F "title=$TITLE" \
+                 -F "message=$MSG" \
+                 -F "priority=10" >/dev/null
+        fi
+        
+        # Send to Discord if webhook URL is configured
+        if [[ -n "$DISCORD_WEBHOOK_URL" ]]; then
+            curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+                 -H "Content-Type: application/json" \
+                 -d "{\"content\":\"**$TITLE**\n$MSG\"}" >/dev/null
+        fi
     else
         # OK message
+        TITLE="GPS restored"
         MSG="✅ GPS/NMEA is primary and has signal again on SERVER-NAME."
-        curl -s -X POST "$GOTIFY_URL" \
-             -F "title=GPS restored" \
-             -F "message=$MSG" \
-             -F "priority=5" >/dev/null
+        
+        # Send to Gotify if URL is configured
+        if [[ -n "$GOTIFY_URL" ]]; then
+            curl -s -X POST "$GOTIFY_URL" \
+                 -F "title=$TITLE" \
+                 -F "message=$MSG" \
+                 -F "priority=5" >/dev/null
+        fi
+        
+        # Send to Discord if webhook URL is configured
+        if [[ -n "$DISCORD_WEBHOOK_URL" ]]; then
+            curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+                 -H "Content-Type: application/json" \
+                 -d "{\"content\":\"**$TITLE**\n$MSG\"}" >/dev/null
+        fi
     fi
 fi
 

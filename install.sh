@@ -40,6 +40,16 @@ fi
 
 echo "📋 Installing monitoring script to $INSTALL_PATH..."
 cp "$MONITOR_SCRIPT" "$INSTALL_PATH"
+
+# Fix line endings (convert CRLF to LF if needed)
+# This prevents "No such file or directory" errors with the shebang
+if command -v dos2unix &> /dev/null; then
+    dos2unix "$INSTALL_PATH" 2>/dev/null || true
+else
+    # Fallback: use sed to remove carriage returns
+    sed -i 's/\r$//' "$INSTALL_PATH"
+fi
+
 chmod 755 "$INSTALL_PATH"
 echo "✅ Script installed"
 
@@ -58,6 +68,10 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/check_gps_status.sh
+
+# Runtime directory for state file
+RuntimeDirectory=chrony-gps-monitor
+RuntimeDirectoryMode=0755
 
 # Security hardening
 DynamicUser=yes
@@ -78,9 +92,6 @@ RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 SystemCallFilter=@system-service
 SystemCallFilter=~@privileged @resources
 SystemCallErrorNumber=EPERM
-
-# Allow write access to status file directory
-ReadWritePaths=/var/tmp
 
 # Capabilities
 CapabilityBoundingSet=

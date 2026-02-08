@@ -14,13 +14,22 @@ GOTIFY_URL="https://your-gotify-server.com/message?token=YOUR_TOKEN"
 # Leave empty to disable Discord notifications
 DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/WEBHOOK_ID/WEBHOOK_TOKEN"
 
+# Server name to include in notification messages
+# REPLACE with your server's hostname or a friendly name
+SERVER_NAME="$(hostname)"
+
 # Name of the GPS/NMEA source as it appears in 'chronyc sources'
 # Change this if your source has a different name than "NMEA"
 GPS_NAME="PPS"  # Example: "PPS", "NMEA", or whatever your GPS source is called in chronyc
 
 # Location of the temporary status file
 # Usually, you don't need to change this
-STATUS_FILE="/var/tmp/gps_primary_status"
+# When running as systemd service, use $RUNTIME_DIRECTORY if available
+if [[ -n "$RUNTIME_DIRECTORY" ]]; then
+    STATUS_FILE="$RUNTIME_DIRECTORY/gps_primary_status"
+else
+    STATUS_FILE="/var/tmp/gps_primary_status"
+fi
 
 
 ######################################
@@ -76,7 +85,7 @@ if [[ "$CURRENT_STATUS" != "$PREV_STATUS" ]]; then
     if [[ "$CURRENT_STATUS" == "FAIL" ]]; then
         # FAIL message
         TITLE="GPS issue detected"
-        MSG="🔴 GPS/NMEA is either not primary or has lost signal (reach=0) on SERVER-NAME!"
+        MSG="🔴 GPS/NMEA is either not primary or has lost signal (reach=0) on $SERVER_NAME!"
         
         # Send to Gotify if URL is configured
         if [[ -n "$GOTIFY_URL" ]]; then
@@ -95,7 +104,7 @@ if [[ "$CURRENT_STATUS" != "$PREV_STATUS" ]]; then
     else
         # OK message
         TITLE="GPS restored"
-        MSG="✅ GPS/NMEA is primary and has signal again on SERVER-NAME."
+        MSG="✅ GPS/NMEA is primary and has signal again on $SERVER_NAME."
         
         # Send to Gotify if URL is configured
         if [[ -n "$GOTIFY_URL" ]]; then

@@ -24,9 +24,9 @@ GPS_NAME="PPS"  # Example: "PPS", "NMEA", or whatever your GPS source is called 
 
 # Location of the temporary status file
 # Usually, you don't need to change this
-# When running as systemd service, use $RUNTIME_DIRECTORY if available
-if [[ -n "$RUNTIME_DIRECTORY" ]]; then
-    STATUS_FILE="$RUNTIME_DIRECTORY/gps_primary_status"
+# When running as systemd service, use $STATE_DIRECTORY if available
+if [[ -n "$STATE_DIRECTORY" ]]; then
+    STATUS_FILE="$STATE_DIRECTORY/gps_primary_status"
 else
     STATUS_FILE="/var/tmp/gps_primary_status"
 fi

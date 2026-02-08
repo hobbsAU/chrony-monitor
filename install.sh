@@ -69,9 +69,9 @@ Wants=network-online.target
 Type=oneshot
 ExecStart=/usr/local/bin/check_gps_status.sh
 
-# Runtime directory for state file
-RuntimeDirectory=chrony-gps-monitor
-RuntimeDirectoryMode=0755
+# State directory for persistent status file
+StateDirectory=chrony-gps-monitor
+StateDirectoryMode=0755
 
 # Security hardening
 DynamicUser=yes

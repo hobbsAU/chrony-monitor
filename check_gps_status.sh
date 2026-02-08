@@ -7,12 +7,14 @@
 # Gotify server URL + API token
 # REPLACE with your own server address and token
 # Leave empty to disable Gotify notifications
-GOTIFY_URL="https://your-gotify-server.com/message?token=YOUR_TOKEN"
+# GOTIFY_URL="https://your-gotify-server.com/message?token=YOUR_TOKEN"
+GOTIFY_URL=""
 
 # Discord webhook URL
 # REPLACE with your Discord webhook URL
 # Leave empty to disable Discord notifications
-DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/WEBHOOK_ID/WEBHOOK_TOKEN"
+# DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/WEBHOOK_ID/WEBHOOK_TOKEN"
+DISCORD_WEBHOOK_URL=""
 
 # Server name to include in notification messages
 # REPLACE with your server's hostname or a friendly name
